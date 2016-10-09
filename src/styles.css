@@ -1,0 +1,12 @@
+
+.summary .counts {
+  display: inline-block;
+  min-width: 150px;
+}
+.summary .bandwidth {
+  display: inline-block;
+  min-width: 100px;
+}
+.folder {
+  margin: 12px;
+}
