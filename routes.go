@@ -69,6 +69,9 @@ func (d *daemonMonitor) Router() http.Handler {
 		c.JSON(200, resp)
 	})
 
+	a.GET("/", func(c *ace.C) {
+		c.Redirect("/web/")
+	})
 	fs := http.StripPrefix("/web/", http.FileServer(FS(false)))
 	a.GET("/web/*filepath", func(c *ace.C) {
 		fs.ServeHTTP(c.Writer, c.Request)
