@@ -8,61 +8,17 @@ import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
-import {addFolder} from './actions'
+import {ConnectedAddNew} from "./add-new"
+import {showAddNew} from "./actions"
 
 export class App extends Component {
-  constructor() {
-    super()
-    this.state = {
-      showNew: false,
-      newPath: "",
-      newSecret: ""
-    }
-  }
   renderNew() {
-    if (!this.state.showNew) {
+    if (!this.props.showNew) {
       return null
     }
 
     return (
-      <Card
-        className="folder"
-        key={this.props.Path}
-      >
-        <CardHeader
-          title="Add New Folder"
-        />
-        <CardText>
-          <TextField
-            style={{width: "100%"}}
-            value={this.state.newSecret}
-            onChange={e=>this.setState({newSecret: e.target.value})}
-            floatingLabelText="Secret (optional)"
-          />
-          <TextField
-            style={{width: "100%"}}
-            value={this.state.newPath}
-            onChange={e=>this.setState({newPath: e.target.value})}
-            floatingLabelText="Path"
-          />
-
-          <FlatButton
-            label="Create"
-            disabled={!/^\/.+/.test(this.state.newPath)}
-            onClick={()=>{
-              this.props.addNew(this.state.newPath, this.state.newSecret)
-              this.setState({newPath: "", newSecret:"", showNew: false})
-            }}
-            primary
-          />
-          <FlatButton
-            label="Cancel"
-            onClick={() => this.setState({showNew: false, newSecret: "", newPath: ""})}
-            secondary
-          />
-
-        </CardText>
-      </Card>
+      <ConnectedAddNew />
     )
   }
   render() {
@@ -70,7 +26,7 @@ export class App extends Component {
       <div>
         <AppBar
           title="Librevault"
-          iconElementLeft={<IconButton onClick={()=>this.setState({showNew: !this.state.showNew})}><ContentAdd /></IconButton>}
+          iconElementLeft={<IconButton onClick={this.props.showAddNew}><ContentAdd /></IconButton>}
         />
         {this.renderNew()}
         {this.props.folderPaths.map(path=> <ConnectedFolder key={path} Path={path} />)}
@@ -81,12 +37,13 @@ export class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    folderPaths: state.folders.map(f=>f.Path)
+    folderPaths: state.folders.map(f=>f.Path),
+    showNew: state.adding.show
   }
 }
 const mapDispatchToProps = dispatch => {
   return {
-    addNew: (path, secret) => dispatch(addFolder(path, secret))
+    showAddNew: () => dispatch(showAddNew())
   }
 }
 

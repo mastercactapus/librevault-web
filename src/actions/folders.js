@@ -7,7 +7,10 @@ export function fetchFolders() {
     dispatch({type: FETCH_FOLDERS, pending: true})
     return fetch("/api/folders")
     .then(resp=>{
-      if (!resp.ok) throw new Error(resp.statusText)
+      if (!resp.ok) {
+        return resp.text()
+          .then(message=>{throw new Error(message)})
+      }
       return resp.json()
     })
     .then(folders=>dispatch({type: FETCH_FOLDERS_SUCCESS, folders}))
@@ -29,7 +32,10 @@ export function addFolder(folderPath, secret) {
       })
     })
     .then(resp => {
-      if (!resp.ok) throw new Error(resp.statusText)
+      if (!resp.ok) {
+        return resp.text()
+          .then(message=>{throw new Error(message)})
+      }
       return resp.json()
     })
     .then(folder=>dispatch({type: ADD_FOLDER_SUCCESS, folderPath, folder}))
@@ -47,26 +53,13 @@ export function removeFolder(folderPath) {
       method: "DELETE"
     })
     .then(resp=>{
-      if (!resp.ok) throw new Error(resp.statusText)
+      if (!resp.ok) {
+        return resp.text()
+          .then(message=>{throw new Error(message)})
+      }
       return resp.text()
     })
     .then(secret => dispatch({type: REMOVE_FOLDER_SUCCESS, folderPath, secret}))
     .catch(error => dispatch({type: REMOVE_FOLDER_FAILURE, folderPath, secret, error}))
-  }
-}
-
-export const FETCH_SECRETS = "FETCH_SECRETS"
-export const FETCH_SECRETS_SUCCESS = "FETCH_SECRETS_SUCCESS"
-export const FETCH_SECRETS_FAILURE = "FETCH_SECRETS_FAILURE"
-export function fetchSecrets(folderPath) {
-  return dispatch => {
-    dispatch({type: FETCH_SECRETS, folderPath})
-    return fetch(encodeURI("/api/folders/" + encodeURIComponent(folderPath) + "/secrets"))
-    .then(resp=>{
-      if (!resp.ok) throw new Error(resp.statusText)
-      return resp.json()
-    })
-    .then(secrets=>dispatch({type: FETCH_SECRETS_SUCCESS, folderPath, secrets}))
-    .catch(error=>dispatch({type: FETCH_SECRETS_FAILURE, folderPath, error}))
   }
 }
