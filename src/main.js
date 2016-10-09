@@ -5,7 +5,7 @@ import {ConnectedApp} from "./app"
 import {Provider} from "react-redux"
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import reducer from "./reducers"
-import {refreshFolders} from "./actions"
+import {fetchFolders} from "./actions"
 import thunk from "redux-thunk"
 import { createStore, applyMiddleware, compose } from 'redux';
 
@@ -21,8 +21,8 @@ const store = createStore(
   )
 );
 
-setInterval(()=>store.dispatch(refreshFolders()), 5000)
-store.dispatch(refreshFolders())
+setInterval(()=>store.dispatch(fetchFolders()), 5000)
+store.dispatch(fetchFolders())
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941

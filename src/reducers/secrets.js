@@ -1,8 +1,8 @@
-import {FETCH_SECRETS} from "../actions"
+import {FETCH_SECRETS_SUCCESS} from "../actions"
 
 export function secretsReducer(state = {}, action) {
   switch (action.type) {
-    case FETCH_SECRETS:
+    case FETCH_SECRETS_SUCCESS:
       return {
         ...state,
         [action.folderPath]: action.secrets
