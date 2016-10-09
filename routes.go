@@ -3,8 +3,11 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 
 	"github.com/mastercactapus/librevault"
 	"github.com/plimble/ace"
@@ -34,6 +37,37 @@ func (d *daemonMonitor) Router() http.Handler {
 	a.GET("/api/folders/:folderPath/secrets", d.ServeHTTPFolderSecrets)
 	a.DELETE("/api/folders/:folderPath", d.ServeHTTPDeleteFolder)
 	a.POST("/api/folders", d.ServeHTTPCreateFolder)
+	a.GET("/api/browse/*filepath", func(c *ace.C) {
+		path := c.Param("filepath")
+		infos, err := ioutil.ReadDir(path)
+		if err != nil {
+			if os.IsNotExist(err) {
+				c.AbortWithStatus(404)
+				return
+			}
+
+			if os.IsPermission(err) {
+				c.AbortWithStatus(403)
+				return
+			}
+
+			c.String(500, err.Error())
+			return
+		}
+		resp := make([]string, 0, len(infos))
+		for _, i := range infos {
+			if !i.IsDir() {
+				continue
+			}
+			if strings.HasPrefix(i.Name(), ".") {
+				continue
+			}
+
+			resp = append(resp, i.Name())
+		}
+
+		c.JSON(200, resp)
+	})
 
 	fs := http.StripPrefix("/web/", http.FileServer(FS(false)))
 	a.GET("/web/*filepath", func(c *ace.C) {

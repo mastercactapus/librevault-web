@@ -9,15 +9,32 @@ import FlatButton from 'material-ui/FlatButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import CircularProgress from 'material-ui/CircularProgress';
+import {DirBrowser} from './dir-browser'
 
+import NavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
+import NavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 
 export class AddNew extends Component {
   constructor() {
     super()
     this.state = {
-      path: "",
-      secret: ""
+      path: "/",
+      secret: "",
+      showBrowser: false
     }
+  }
+  setPath(path) {
+    this.setState({
+      path: path.replace(/^\/*/, "/").replace(/\/\//g, "/")
+    })
+  }
+  setSecret(secret) {
+    if (!/^([ACD](1[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]*)?)?$/.test(secret)) {
+      return
+    }
+    this.setState({
+      secret: secret.trim()
+    })
   }
   render() {
     const errorMessage = this.props.error ? this.props.error.message : ""
@@ -44,7 +61,12 @@ export class AddNew extends Component {
         </div>
       )
     }
-
+    let browser
+    if (this.state.showBrowser) {
+      browser = (
+        <DirBrowser path={this.state.path} onChange={path=>this.setPath(path)} />
+      )
+    }
     return (
       <Card
         className="folder"
@@ -56,16 +78,22 @@ export class AddNew extends Component {
           <TextField
             style={{width: "100%"}}
             value={this.state.secret}
-            onChange={e=>this.setState({secret: e.target.value})}
+            onChange={e=>this.setSecret(e.target.value)}
             floatingLabelText="Secret (optional)"
           />
-          <TextField
-            style={{width: "100%"}}
-            value={this.state.path}
-            onChange={e=>this.setState({path: e.target.value})}
-            floatingLabelText="Path"
-          />
+          <div>
+            <TextField
+              style={{width: "calc(100% - 48px)"}}
+              value={this.state.path}
+              onChange={e=>this.setPath(e.target.value)}
+              floatingLabelText="Path"
+            />
+            <IconButton tooltip="Directory browser" onClick={()=>this.setState({showBrowser: !this.state.showBrowser})}>
+              {this.state.showBrowser ? <NavigationExpandLess /> : <NavigationExpandMore />}
+            </IconButton>
+          </div>
 
+          {browser}
           {actions}
 
         </CardText>
