@@ -145,7 +145,6 @@ func (d *daemonMonitor) RemoveFolder(secret *librevault.Secret) error {
 	if err != nil {
 		return err
 	}
-	log.Infoln("remove", string(data))
 	d.sendData <- data
 	return nil
 }
