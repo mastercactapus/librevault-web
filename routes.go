@@ -16,14 +16,14 @@ import (
 type folder struct {
 	Path          string
 	Peers         int
-	DownBandwidth int
-	UpBandwidth   int
+	DownBandwidth float64
+	UpBandwidth   float64
 	Files         int
 	Type          librevault.SecretType
 }
 
-func calcBandwidth(peers []peer) (int, int) {
-	var up, down int
+func calcBandwidth(peers []peer) (float64, float64) {
+	var up, down float64
 	for _, p := range peers {
 		up += p.UpBandwidth
 		down += p.DownBandwidth

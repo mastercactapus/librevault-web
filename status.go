@@ -26,8 +26,8 @@ type folderState struct {
 }
 type peer struct {
 	Name          string
-	DownBandwidth int `json:"down_bandwidth"`
-	UpBandwidth   int `json:"up_bandwidth"`
+	DownBandwidth float64 `json:"down_bandwidth"`
+	UpBandwidth   float64 `json:"up_bandwidth"`
 }
 
 type daemonMonitor struct {
