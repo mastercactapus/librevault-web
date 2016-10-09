@@ -1,4 +1,4 @@
 node_modules/
-/librevault-web
+/librevault-web*
 /dist
-
+/static.go
