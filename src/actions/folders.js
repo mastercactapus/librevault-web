@@ -60,6 +60,6 @@ export function removeFolder(folderPath) {
       return resp.text()
     })
     .then(secret => dispatch({type: REMOVE_FOLDER_SUCCESS, folderPath, secret}))
-    .catch(error => dispatch({type: REMOVE_FOLDER_FAILURE, folderPath, secret, error}))
+    .catch(error => dispatch({type: REMOVE_FOLDER_FAILURE, folderPath, error}))
   }
 }

@@ -37,7 +37,8 @@ export class App extends Component {
 
 const mapStateToProps = state => {
   return {
-    folderPaths: state.folders.map(f=>f.Path),
+    // exclude pending removals
+    folderPaths: state.folders.map(f=>f.Path).filter(path=>!state.removed.some(r=>r.folderPath===path&&r.pending)),
     showNew: state.adding.show
   }
 }

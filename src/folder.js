@@ -28,6 +28,14 @@ export class Folder extends Component {
     }
   }
   render() {
+    let error
+    if (this.props.removeError) {
+      error = (
+        <div>
+          <p style={{color: '#EF5350'}}>Remove failed: {this.props.removeError.message}</p>
+        </div>
+      )
+    }
     const subtitle = (
       <span className="summary">
         <span className="counts">
@@ -41,8 +49,10 @@ export class Folder extends Component {
           <FileFileUpload color="gray" />
           {byteLabel(this.props.UpBandwidth)}
         </span>
+        {error}
       </span>
     )
+
     return (
       <Card
         className="folder"
@@ -104,7 +114,8 @@ const mapStateToProps = (state, props) => {
   const folder = state.folders.find(f=>f.Path === props.Path)
   return {
     ...folder,
-    ...state.secrets[props.Path]||{}
+    ...state.secrets[props.Path]||{},
+    removeError: (state.removed.find(f=>f.folderPath === props.Path && !f.pending && f.error)||{}).error
   }
 }
 const mapDispatchToProps = (dispatch, props) => {
