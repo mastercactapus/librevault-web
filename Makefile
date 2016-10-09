@@ -6,7 +6,7 @@ librevault-web: static.go *.go
 librevault-web.exe: static.go *.go
 	GOOS=windows go build
 librevault-web.darwin: static.go *.go
-	GOOS=darwin go build
+	GOOS=darwin go build -o librevault-web.darwin
 
 static.go: dist/bundle.js index.html
 	go generate
