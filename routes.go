@@ -1,3 +1,5 @@
+//go:generate esc -o static.go dist/bundle.js index.html
+
 package main
 
 import (
@@ -32,6 +34,11 @@ func (d *daemonMonitor) Router() http.Handler {
 	a.GET("/api/folders/:folderPath/secrets", d.ServeHTTPFolderSecrets)
 	a.DELETE("/api/folders/:folderPath", d.ServeHTTPDeleteFolder)
 	a.POST("/api/folders", d.ServeHTTPCreateFolder)
+
+	fs := http.StripPrefix("/web/", http.FileServer(FS(false)))
+	a.GET("/web/*filepath", func(c *ace.C) {
+		fs.ServeHTTP(c.Writer, c.Request)
+	})
 	return a
 }
 
@@ -81,7 +88,11 @@ func (d *daemonMonitor) ServeHTTPCreateFolder(c *ace.C) {
 		Type: sec.Type,
 	}
 
-	// TODO: create it
+	err = d.AddFolder(req.Path, sec)
+	if err != nil {
+		c.String(500, err.Error())
+		return
+	}
 
 	c.JSON(201, f)
 }
@@ -101,6 +112,11 @@ func (d *daemonMonitor) ServeHTTPDeleteFolder(c *ace.C) {
 	for _, f := range s.Folders {
 		if f.Path != path {
 			continue
+		}
+		err = d.RemoveFolder(f.Secret)
+		if err != nil {
+			c.String(500, err.Error())
+			return
 		}
 		// TODO: actually delete it
 		c.String(200, f.Secret.String())
