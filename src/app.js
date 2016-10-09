@@ -9,7 +9,8 @@ import FlatButton from 'material-ui/FlatButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import {ConnectedAddNew} from "./add-new"
-import {showAddNew} from "./actions"
+import {showAddNew, addFolder} from "./actions"
+import Snackbar from 'material-ui/Snackbar';
 
 export class App extends Component {
   renderNew() {
@@ -36,6 +37,21 @@ export class App extends Component {
       </center>
     )
   }
+  renderSnackbar() {
+    if (!this.props.lastRemoval) {
+      return null
+    }
+    const {folderPath, secret} = this.props.lastRemoval
+    return (
+      <Snackbar
+        open={true}
+        message={"Removed: " + folderPath}
+        action="undo"
+        autoHideDuration={3000}
+        onActionTouchTap={()=>this.props.addFolder(folderPath, secret)}
+      />
+    )
+  }
   render() {
     if (!this.props.connected) {
       return this.renderNotConnected()
@@ -48,6 +64,7 @@ export class App extends Component {
         />
         {this.renderNew()}
         {this.props.folderPaths.map(path=> <ConnectedFolder key={path} Path={path} />)}
+        {this.renderSnackbar()}
       </div>
     )
   }
@@ -59,12 +76,14 @@ const mapStateToProps = state => {
     folderPaths: state.folders.map(f=>f.Path).filter(path=>!state.removed.some(r=>r.folderPath===path&&r.pending)),
     showNew: state.adding.show,
     daemonError: state.daemon.error,
-    connected: state.daemon.connected
+    connected: state.daemon.connected,
+    lastRemoval: state.removed.slice().reverse().find(r=>!r.error&&!r.pending)
   }
 }
 const mapDispatchToProps = dispatch => {
   return {
-    showAddNew: () => dispatch(showAddNew())
+    showAddNew: () => dispatch(showAddNew()),
+    addFolder: (path, secret) => dispatch(addFolder(path, secret))
   }
 }
 

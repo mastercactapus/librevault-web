@@ -27,13 +27,6 @@ export function removedReducer(state = [], action) {
       })
     case ADD_FOLDER_SUCCESS:
       return state.filter(f=>f.folderPath!==action.folderPath)
-    case FETCH_FOLDERS_SUCCESS:
-      const paths = action.folders.map(f=>f.Path)
-      const newState = state.filter(f=>!paths.includes(f.folderPath)||f.error||f.pending)
-      if (newState.length === state.length) {
-        return state
-      }
-      return newState
   }
   return state
 }
