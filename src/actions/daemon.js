@@ -26,7 +26,7 @@ export function addFolder(folderPath, secret) {
       return resp.json()
     })
     .then(folder=>{
-      dispatch({type: ADD_FOLDER, folerPath, folder})
+      dispatch({type: ADD_FOLDER, folderPath, folder})
     })
   }
 }

@@ -30,7 +30,84 @@ func (d *daemonMonitor) Router() http.Handler {
 	a := ace.New()
 	a.GET("/api/folders", d.ServeHTTPFolders)
 	a.GET("/api/folders/:folderPath/secrets", d.ServeHTTPFolderSecrets)
+	a.DELETE("/api/folders/:folderPath", d.ServeHTTPDeleteFolder)
+	a.POST("/api/folders", d.ServeHTTPCreateFolder)
 	return a
+}
+
+func (d *daemonMonitor) ServeHTTPCreateFolder(c *ace.C) {
+	s := d.GetState()
+	if s == nil {
+		c.AbortWithStatus(503)
+		return
+	}
+
+	var req struct {
+		Path   string
+		Secret string
+	}
+
+	c.ParseJSON(&req)
+
+	if req.Path == "" {
+		c.String(400, "missing path")
+		return
+	}
+
+	for _, f := range s.Folders {
+		if f.Path == req.Path {
+			c.String(409, "folder already exists at that path")
+		}
+	}
+
+	var sec *librevault.Secret
+	var err error
+	if req.Secret == "" {
+		sec, err = librevault.NewSecret()
+		if err != nil {
+			c.String(500, "could not create secret: %s", err.Error())
+			return
+		}
+	} else {
+		sec, err = librevault.ParseSecret(req.Secret)
+		if err != nil {
+			c.String(400, "bad secret: %s", err.Error())
+			return
+		}
+	}
+
+	f := folder{
+		Path: req.Path,
+		Type: sec.Type,
+	}
+
+	// TODO: create it
+
+	c.JSON(201, f)
+}
+
+func (d *daemonMonitor) ServeHTTPDeleteFolder(c *ace.C) {
+	s := d.GetState()
+	if s == nil {
+		c.AbortWithStatus(503)
+		return
+	}
+	path, err := url.QueryUnescape(c.Param("folderPath"))
+	if err != nil {
+		c.String(400, "bad folderPath: %s", err.Error())
+		return
+	}
+
+	for _, f := range s.Folders {
+		if f.Path != path {
+			continue
+		}
+		// TODO: actually delete it
+		c.String(200, f.Secret.String())
+		return
+	}
+
+	c.AbortWithStatus(404)
 }
 
 func (d *daemonMonitor) ServeHTTPFolderSecrets(c *ace.C) {

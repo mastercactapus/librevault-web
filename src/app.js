@@ -48,8 +48,11 @@ export class App extends Component {
 
           <FlatButton
             label="Create"
-            disabled={!this.state.newPath}
-            onClick={()=>this.props.addNew(this.state.newPath, this.state.newSecret)}
+            disabled={!/^\/.+/.test(this.state.newPath)}
+            onClick={()=>{
+              this.props.addNew(this.state.newPath, this.state.newSecret)
+              this.setState({newPath: "", newSecret:"", showNew: false})
+            }}
             primary
           />
           <FlatButton
