@@ -9,7 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import {ConnectedAddNew} from "./add-new"
-import {showAddNew, addFolder} from "./actions"
+import {showAddNew, addFolder, removeFolderAccept} from "./actions"
 import Snackbar from 'material-ui/Snackbar';
 
 export class App extends Component {
@@ -47,8 +47,9 @@ export class App extends Component {
         open={true}
         message={"Removed: " + folderPath}
         action="undo"
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onActionTouchTap={()=>this.props.addFolder(folderPath, secret)}
+        onRequestClose={reason=>reason==="timeout" && this.props.removeAccept(folderPath)}
       />
     )
   }
@@ -83,7 +84,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     showAddNew: () => dispatch(showAddNew()),
-    addFolder: (path, secret) => dispatch(addFolder(path, secret))
+    addFolder: (path, secret) => dispatch(addFolder(path, secret)),
+    removeAccept: path => dispatch(removeFolderAccept(path))
   }
 }
 

@@ -3,7 +3,8 @@ import {
   ADD_FOLDER_SUCCESS,
   REMOVE_FOLDER,
   REMOVE_FOLDER_SUCCESS,
-  REMOVE_FOLDER_FAILURE
+  REMOVE_FOLDER_FAILURE,
+  REMOVE_FOLDER_ACCEPT
 } from "../actions"
 
 export function removedReducer(state = [], action) {
@@ -25,6 +26,7 @@ export function removedReducer(state = [], action) {
         folderPath: action.folderPath,
         secret: action.secret
       })
+    case REMOVE_FOLDER_ACCEPT:
     case ADD_FOLDER_SUCCESS:
       return state.filter(f=>f.folderPath!==action.folderPath)
   }

@@ -43,6 +43,11 @@ export function addFolder(folderPath, secret) {
   }
 }
 
+export const REMOVE_FOLDER_ACCEPT = "REMOVE_FOLDER_ACCEPT"
+export function removeFolderAccept(folderPath) {
+  return {type: REMOVE_FOLDER_ACCEPT, folderPath}
+}
+
 export const REMOVE_FOLDER = "REMOVE_FOLDER"
 export const REMOVE_FOLDER_SUCCESS = "REMOVE_FOLDER_SUCCESS"
 export const REMOVE_FOLDER_FAILURE = "REMOVE_FOLDER_FAILURE"
