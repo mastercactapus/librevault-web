@@ -21,7 +21,25 @@ export class App extends Component {
       <ConnectedAddNew />
     )
   }
+  renderNotConnected() {
+    if (this.props.daemonError) {
+      return (
+        <center>
+          <h1 style={{color: '#EF5350'}}>Cannot connect to librevault-daemon</h1>
+          <h2 style={{color: '#EF5350'}}>{this.props.daemonError.message}</h2>
+        </center>
+      )
+    }
+    return (
+      <center>
+        <h1>Connecting to librevault-daemon...</h1>
+      </center>
+    )
+  }
   render() {
+    if (!this.props.connected) {
+      return this.renderNotConnected()
+    }
     return (
       <div>
         <AppBar
@@ -39,7 +57,9 @@ const mapStateToProps = state => {
   return {
     // exclude pending removals
     folderPaths: state.folders.map(f=>f.Path).filter(path=>!state.removed.some(r=>r.folderPath===path&&r.pending)),
-    showNew: state.adding.show
+    showNew: state.adding.show,
+    daemonError: state.daemon.error,
+    connected: state.daemon.connected
   }
 }
 const mapDispatchToProps = dispatch => {
