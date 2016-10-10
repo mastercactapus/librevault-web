@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"net"
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
@@ -23,6 +24,26 @@ func main() {
 	mon := newDaemonMonitor(*dAddr)
 	http.Handle("/", mon.Router())
 
+	host, port, err := net.SplitHostPort(*lAddr)
+	if err != nil {
+		log.Fatalln("bad listen address:", err)
+	}
+	if host == "" {
+		host = "[::]"
+	}
+
+	var uiURL string
+	if *tlsEnabled {
+		if *certFile == "" && *keyFile == "" {
+			uiURL = "https://[::]/"
+		} else {
+			uiURL = "https://" + host + ":" + port + "/"
+		}
+	} else {
+		uiURL = "http://" + host + ":" + port + "/"
+	}
+
+	log.Infof("serving web ui at: %s", uiURL)
 	if !*tlsEnabled {
 		log.Fatal(http.ListenAndServe(*lAddr, nil))
 	} else if *certFile == "" && *keyFile == "" {
