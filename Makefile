@@ -1,7 +1,7 @@
 .PHONY: clean all
 
 NAME=librevault-web
-VERSION=0.0.1
+VERSION=0.0.1-1
 
 build/$(NAME)-$(VERSION)-linux-amd64/$(NAME): static.go *.go
 	GOOS=linux go build -o $@
