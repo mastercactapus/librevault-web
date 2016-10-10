@@ -12,6 +12,21 @@ import {ConnectedAddNew} from "./add-new"
 import {showAddNew, addFolder, removeFolderAccept} from "./actions"
 import Snackbar from 'material-ui/Snackbar';
 
+const shortName = name => {
+  const parts = name.replace(/^\/?/, "/").split("/")
+  const last = parts.slice(-1)[0]
+  const prefix = "/" + parts.slice(1,-1).map(f=>f[0] + "…").join("/") + "/"
+
+  return prefix + ellipsis(last)
+}
+
+const ellipsis = str => {
+  if (str.length > 30) {
+    return str.slice(0, 15) + "…" + str.slice(-15)
+  }
+  return str
+}
+
 export class App extends Component {
   renderNew() {
     if (!this.props.showNew) {
@@ -45,7 +60,7 @@ export class App extends Component {
     return (
       <Snackbar
         open={true}
-        message={"Removed: " + folderPath}
+        message={"Removed: " + shortName(folderPath)}
         action="undo"
         autoHideDuration={5000}
         onActionTouchTap={()=>this.props.addFolder(folderPath, secret)}
