@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import {List, ListItem} from 'material-ui/List';
 import Paper from 'material-ui/Paper';
+import AutoComplete from 'material-ui/AutoComplete';
 
 class DirData {
   constructor() {
@@ -30,18 +31,19 @@ class DirData {
     })
   }
 }
-const cleanPath = path => path.replace(/^\/*/, "/").replace(/\/+$/,"").replace(/\/\//g, "/")
+const cleanPath = path => path.replace(/\/\//g, "/").replace(/^\/?/, "/").replace(/\/$/,"")
+const cleanParent = path => cleanPath(path.replace(/[^/]+$/, "")) || "/"
 
 export class DirBrowser extends Component {
   constructor(props) {
     super()
-    this.state = {}
+    this.state = {showAC: undefined}
     this.data = new DirData()
-    this.refresh(props.path)
+    this.refresh(cleanParent(props.path))
   }
   componentWillReceiveProps(nextProps) {
-    if (cleanPath(nextProps.path) !== cleanPath(this.props.path)) {
-      this.refresh(cleanPath(nextProps.path))
+    if (cleanParent(nextProps.path) !== cleanParent(this.props.path)) {
+      this.refresh(cleanParent(nextProps.path))
     }
   }
   refresh(path) {
@@ -49,47 +51,68 @@ export class DirBrowser extends Component {
       path = "/"
     }
     return this.data.get(path)
-    .then(items=>this.setState({["dir_" + cleanPath(path)]: items}))
-    .catch(error=>this.setState({["dir_" + cleanPath(path)]: error}))
+    .then(items=>this.setState({["dir_" + path]: items}))
+    .catch(error=>this.setState({["dir_" + path]: error}))
   }
 
   getItems() {
-    return this.state["dir_" + cleanPath(this.props.path)]
+    return this.state["dir_" + cleanParent(this.props.path)]
   }
   render() {
     const items = this.getItems()
-    if (!items) {
-      return (
-        <div>
-          Fetching...
-        </div>
-      )
-    }
+
+    let errorText
+    let dataSource = []
+
 
     if (items instanceof Error) {
       switch (items.code) {
         case 404:
-        return <div>Not Found</div>
+          errorText = "not found"
+          break
         case 403:
-        return <div>Permission denied</div>
+          errorText = "permission denied"
+          break
         default:
-        return <div>{items.message}</div>
+          errorText = items.message
+          break
       }
+    } else if (items) {
+      dataSource = items.sort().map(item => cleanParent(this.props.path).replace(/\/*$/, "/") + item)
     }
 
     return (
-      <Paper>
-        <List style={{columnCount: 4}}>
-          {items.map(name=>(
-              <ListItem
-                key={name}
-                style={{columnSpan: 0}}
-                onClick={()=>this.props.onChange(this.props.path + "/" + name)}
-                primaryText={"/" + name}
-              />
-          ))}
-        </List>
-      </Paper>
+      <AutoComplete
+        open={this.state.showAC}
+        dataSource={dataSource}
+        errorText={errorText}
+        fullWidth
+        searchText={this.props.path}
+        onUpdateInput={text=>{
+          this.props.onChange(text)
+          this.setState({showAC: undefined})
+        }}
+        ref={el=>this._acRef = el}
+        onNewRequest={(text,index)=>{
+          if (index===-1) {
+            this.setState({showAC: undefined})
+
+            return
+          }
+          this.props.onChange(text + "/")
+
+          if (this._acRef) {
+            this._acRef.focus()
+            this.setState({showAC: true})
+          }
+        }}
+        floatingLabelText="Path"
+        filter={AutoComplete.fuzzyFilter}
+        maxSearchResults={20}
+        animated={false}
+        openOnFocus
+      />
     )
+
   }
 }

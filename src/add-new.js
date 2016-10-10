@@ -61,12 +61,7 @@ export class AddNew extends Component {
         </div>
       )
     }
-    let browser
-    if (this.state.showBrowser) {
-      browser = (
-        <DirBrowser path={this.state.path} onChange={path=>this.setPath(path)} />
-      )
-    }
+
     return (
       <Card
         className="folder"
@@ -81,19 +76,8 @@ export class AddNew extends Component {
             onChange={e=>this.setSecret(e.target.value)}
             floatingLabelText="Secret (optional)"
           />
-          <div>
-            <TextField
-              style={{width: "calc(100% - 48px)"}}
-              value={this.state.path}
-              onChange={e=>this.setPath(e.target.value)}
-              floatingLabelText="Path"
-            />
-            <IconButton tooltip="Directory browser" onClick={()=>this.setState({showBrowser: !this.state.showBrowser})}>
-              {this.state.showBrowser ? <NavigationExpandLess /> : <NavigationExpandMore />}
-            </IconButton>
-          </div>
+          <DirBrowser path={this.state.path} onChange={path=>this.setPath(path)} />
 
-          {browser}
           {actions}
 
         </CardText>
