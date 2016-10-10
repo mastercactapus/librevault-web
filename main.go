@@ -10,7 +10,7 @@ import (
 
 func main() {
 	dAddr := flag.String("daemon", "ws://localhost:42346/", "Daemon websocket URL. Used to connect to the librevault daemon")
-	lAddr := flag.String("listen", ":3000", "Listen address:port. Used to serve the web UI")
+	lAddr := flag.String("listen", ":42350", "Listen address:port. Used to serve the web UI")
 
 	certFile := flag.String("certFile", "", "Certificate file for TLS.")
 	keyFile := flag.String("keyFile", "", "Key file for TLS.")
