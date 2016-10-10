@@ -1,4 +1,4 @@
-//go:generate esc -o static.go dist/bundle.js index.html
+//go:generate esc -o static.go static/bundle.js index.html
 
 package main
 
