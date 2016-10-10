@@ -2,3 +2,4 @@ node_modules/
 /librevault-web*
 /dist
 /static.go
+letsencrypt.cache
